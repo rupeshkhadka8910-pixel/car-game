@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real Car Racing Game</title>
+
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial;
+            background: lightblue;
+        }
+
+        #game {
+            width: 300px;
+            height: 450px;
+            background: #000;
+            border: 5px solid white;
+            margin: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .line {
+            position: absolute;
+            width: 6px;
+            height: 60px;
+            background: white;
+            left: 147px;
+        }
+
+        #car, #enemy {
+            position: absolute;
+            width: 50px;
+            height: 85px;
+            object-fit: contain;
+            z-index: 2;
+        }
+
+        #car {
+            bottom: 10px;
+            left: 125px;
+        }
+
+        #enemy {
+            top: -100px;
+            left: 50px;
+        }
+
+        button {
+            padding: 10px 18px;
+            margin: 5px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>🏎️ Car Racing Game</h2>
+    <h3>Score: <span id="score">0</span></h3>
+
+    <div id="game">
+        <div class="line" style="top:0px"></div>
+        <div class="line" style="top:100px"></div>
+        <div class="line" style="top:200px"></div>
+        <div class="line" style="top:300px"></div>
+        <div class="line" style="top:400px"></div>
+
+        <img id="car"
+        src="  5 car.jpg " alt="Player car">
+
+        <img id="enemy"
+        src="10 car.jpg" alt="Enemy car">
+    </div>
+
+    <br>
+
+    <button onclick="moveLeft()">⬅ Left</button>
+    <button onclick="moveRight()">Right ➡</button>
+    <button onclick="restart()">Restart</button>
+
+    <script>
+        const car = document.getElementById("car");
+        const enemy = document.getElementById("enemy");
+        const scoreText = document.getElementById("score");
+        const lines = document.querySelectorAll(".line");
+
+        let carX = 125;
+        let enemyX = 50;
+        let enemyY = -100;
+        let score = 0;
+        let speed = 4;
+        let playing = true;
+        let animation;
+
+        function moveLeft() {
+            if (playing && carX > 5) {
+                carX -= 20;
+                car.style.left = carX + "px";
+            }
+        }
+
+        function moveRight() {
+            if (playing && carX < 245) {
+                carX += 20;
+                car.style.left = carX + "px";
+            }
+        }
+
+        document.addEventListener("keydown", function(e) {
+            if (e.key === "ArrowLeft") moveLeft();
+            if (e.key === "ArrowRight") moveRight();
+        });
+
+        function play() {
+            if (!playing) return;
+
+            enemyY += speed;
+
+            lines.forEach(function(line) {
+                let y = parseInt(line.style.top);
+                y += speed;
+
+                if (y > 450) y = -60;
+
+                line.style.top = y + "px";
+            });
+
+            if (enemyY > 450) {
+                enemyY = -100;
+                enemyX = Math.floor(Math.random() * 240) + 5;
+                enemy.style.left = enemyX + "px";
+
+                score++;
+                scoreText.innerText = score;
+                speed += 0.2;
+            }
+
+            enemy.style.top = enemyY + "px";
+
+            let carRect = car.getBoundingClientRect();
+            let enemyRect = enemy.getBoundingClientRect();
+
+            if (
+                carRect.left < enemyRect.right - 8 &&
+                carRect.right > enemyRect.left + 8 &&
+                carRect.top < enemyRect.bottom - 8 &&
+                carRect.bottom > enemyRect.top + 8
+            ) {
+                playing = false;
+                alert("Game Over! Your score: " + score);
+                return;
+            }
+
+            animation = requestAnimationFrame(play);
+        }
+
+        function restart() {
+            cancelAnimationFrame(animation);
+
+            carX = 125;
+            enemyX = 50;
+            enemyY = -100;
+            score = 0;
+            speed = 4;
+            playing = true;
+
+            car.style.left = carX + "px";
+            enemy.style.left = enemyX + "px";
+            enemy.style.top = enemyY + "px";
+            scoreText.innerText = score;
+
+            play();
+        }
+
+        play();
+    </script>
+
+</body>
+</html>
